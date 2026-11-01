@@ -43,30 +43,26 @@ if generate_btn:
     if not api_key:
         st.error("⚠️ Please enter your Gemini API Key in the sidebar to generate the plan.")
     else:
-        try:
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        with st.spinner("Analyzing parameters and computing your event dashboard..."):
+            prompt = f"""
+            Act as an expert luxury event planner. Create a highly structured plan for a {event_type} for {guests} guests with a budget of {budget} INR.
+            Additional details: {extra_details}.
             
-            with st.spinner("Analyzing parameters and computing your event dashboard..."):
-                prompt = f"""
-                Act as an expert luxury event planner. Create a highly structured plan for a {event_type} for {guests} guests with a budget of {budget} INR.
-                Additional details: {extra_details}.
-                
-                Format the response strictly with clear markdown headers, lists, and tables where appropriate:
-                ### 1. 🎨 Personalized Ideas & Theme Suggestions
-                ### 2. 💰 Estimated Budget Breakdown
-                ### 3. 📅 Preparation Timeline
-                ### 4. ✅ Vendor & Task Checklist
-                """
-                
-                response = model.generate_content(prompt)
-                
-                st.success("Dashboard successfully generated!")
-                st.markdown("---")
-                
-                # Displaying the structured AI response in a clean container
-                with st.container():
-                    st.markdown(response.text)
-                    
-       except Exception as e:
-            st.error(f"❌ Error generating plan: {e}. Please check your API key and try again.")
+            Format the response strictly with clear markdown headers, lists, and tables where appropriate:
+            ### 1. 🎨 Personalized Ideas & Theme Suggestions
+            ### 2. 💰 Estimated Budget Breakdown
+            ### 3. 📅 Preparation Timeline
+            ### 4. ✅ Vendor & Task Checklist
+            """
+            
+            response = model.generate_content(prompt)
+            
+            st.success("Dashboard successfully generated!")
+            st.markdown("---")
+            
+            # Displaying the structured AI response in a clean container
+            with st.container():
+                st.markdown(response.text)
