@@ -1,7 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 
-# 1. Page Configuration (Wide Layout for Dashboard feel)
+# 1. Page Configuration 
 st.set_page_config(
     page_title="AI Event Planner Dashboard",
     page_icon="🎉",
@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Sidebar for API Configuration and Instructions
+# 2. Sidebar Configuration
 with st.sidebar:
     st.title("⚙️ Configuration")
     api_key = st.text_input("Enter Gemini API Key", type="password", help="Paste your Google AI Studio key here")
@@ -22,7 +22,7 @@ st.title("🎉 Event Planning Intelligence Dashboard")
 st.markdown("Design your perfect event with AI-driven insights, budget forecasting, and structured timelines.")
 st.markdown("---")
 
-# 4. Input Section (Using Columns for a professional layout)
+# 4. Input Section 
 st.subheader("📋 Define Event Parameters")
 col1, col2, col3 = st.columns(3)
 
@@ -38,33 +38,41 @@ extra_details = st.text_area("✨ Special Requirements or Themes", placeholder="
 st.markdown("<br>", unsafe_allow_html=True)
 generate_btn = st.button("🚀 Generate Comprehensive Event Plan", use_container_width=True, type="primary")
 
-# 5. Output Generation Engine
+# 5. Output Generation Engine (Optimized for Speed via Streaming)
 if generate_btn:
     if not api_key:
         st.error("⚠️ Please enter your Gemini API Key in the sidebar to generate the plan.")
     else:
-        # Strip invisible spaces and use the authorized 2.5 model
         genai.configure(api_key=api_key.strip())
         model = genai.GenerativeModel('gemini-3.8-flash')
         
-        with st.spinner("Analyzing parameters and computing your event dashboard..."):
-            prompt = f"""
-            Act as an expert luxury event planner. Create a highly structured plan for a {event_type} for {guests} guests with a budget of {budget} INR.
-            Additional details: {extra_details}.
+        prompt = f"""
+        Act as an expert luxury event planner. Create a highly structured plan for a {event_type} for {guests} guests with a budget of {budget} INR.
+        Additional details: {extra_details}.
+        
+        Format the response strictly with clear markdown headers, lists, and tables where appropriate:
+        ### 1. 🎨 Personalized Ideas & Theme Suggestions
+        ### 2. 💰 Estimated Budget Breakdown
+        ### 3. 📅 Preparation Timeline
+        ### 4. ✅ Vendor & Task Checklist
+        """
+        
+        st.success("Computing your event dashboard live...")
+        st.markdown("---")
+        
+        try:
+            # Enable stream=True to receive the response in fast, real-time chunks
+            response = model.generate_content(prompt, stream=True)
             
-            Format the response strictly with clear markdown headers, lists, and tables where appropriate:
-            ### 1. 🎨 Personalized Ideas & Theme Suggestions
-            ### 2. 💰 Estimated Budget Breakdown
-            ### 3. 📅 Preparation Timeline
-            ### 4. ✅ Vendor & Task Checklist
-            """
+            # Generator function to yield text chunks to Streamlit
+            def stream_data():
+                for chunk in response:
+                    if chunk.text:
+                        yield chunk.text
             
-            try:
-                response = model.generate_content(prompt)
-                st.success("Dashboard successfully generated!")
-                st.markdown("---")
+            with st.container():
+                # Renders the text instantly as it streams in
+                st.write_stream(stream_data())
                 
-                with st.container():
-                    st.markdown(response.text)
-            except Exception as e:
-                st.error(f"❌ Error generating plan: {e}")
+        except Exception as e:
+            st.error(f"❌ Error generating plan: {e}")
