@@ -68,4 +68,4 @@ if generate_btn:
                 with st.container():
                     st.markdown(response.text)
                     
-        except Exception
+        except Exception as e:
