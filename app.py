@@ -45,7 +45,7 @@ if generate_btn:
     else:
         # Strip invisible spaces and use the authorized 2.5 model
         genai.configure(api_key=api_key.strip())
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel('gemini-3.5-flash')
         
         with st.spinner("Analyzing parameters and computing your event dashboard..."):
             prompt = f"""
