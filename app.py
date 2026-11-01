@@ -44,7 +44,7 @@ if generate_btn:
         st.error("⚠️ Please enter your Gemini API Key in the sidebar to generate the plan.")
     else:
         genai.configure(api_key=api_key.strip())
-    model = genai.GenerativeModel('gemini-3.5-pro')
+        model = genai.GenerativeModel('gemini-3.5-pro')
         
         with st.spinner("Analyzing parameters and computing your event dashboard..."):
             prompt = f"""
