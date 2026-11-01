@@ -68,4 +68,5 @@ if generate_btn:
                 with st.container():
                     st.markdown(response.text)
                     
-        except Exception as e:
+       except Exception as e:
+            st.error(f"❌ Error generating plan: {e}. Please check your API key and try again.")
